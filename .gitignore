@@ -2,3 +2,5 @@
 __pycache__
 artifacts/*
 test/*
+mlops-513607-2ff615081217.json
+logs/
