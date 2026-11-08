@@ -4,3 +4,6 @@ artifacts/*
 test/*
 mlops-513607-2ff615081217.json
 logs/
+*.pkl
+mapping.json
+insert_into_yaml.py

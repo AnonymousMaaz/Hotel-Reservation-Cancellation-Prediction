@@ -1,15 +1,14 @@
 import os
 import sys
-import pandas as pd
 
+import pandas as pd
+from config.paths_config import *
 from google.cloud import storage
 from sklearn.model_selection import train_test_split
-
-from src.logger import get_logger
-from src.custom_exception import CustomException
-from config.paths_config import *
-
 from utils.common_functions import read_yaml
+
+from src.custom_exception import CustomException
+from src.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -75,7 +74,7 @@ class DataIngestion:
             logger.info("Data Ingestion Completed Successfully.")
 
         except Exception as e:
-            logger.error(f"Error Occured in the Data Ingestion: {str(e)}")
+            logger.exception("Error Occured in the Data Ingestion")
             raise CustomException(e, sys) from None
 
         finally:

@@ -1,10 +1,11 @@
-import yaml
 import os
-import pandas
 import sys
+from pathlib import Path
 
-from src.logger import get_logger
+import pandas as pd
+import yaml
 from src.custom_exception import CustomException
+from src.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -22,10 +23,21 @@ def read_yaml(file_path: str):
 
             return config
     except Exception as e:
-        logger.error("Error reading the YAML File.")
+        logger.exception("Error reading the YAML File.")
         raise CustomException(e, sys) from None
 
 
-# if __name__ == "__main__":
-#     contents = read_yaml("config/config.yaml")
-#     print(contents["data_ingestion"]["bucket_name"])
+def load_data(path: Path | os.PathLike):
+    try:
+        path = Path(path).expanduser().resolve()
+        logger.info(f"Loading Data from path: {path}")
+        return pd.read_csv(path)
+    except Exception as e:
+        logger.exception("Error while loading the data")
+        raise CustomException(e, sys) from None
+
+
+if __name__ == "__main__":
+    contents = read_yaml("config/config.yaml")
+    print(contents["data_processing"])
+    # load_data("../artifacts/raw/train.csv")
