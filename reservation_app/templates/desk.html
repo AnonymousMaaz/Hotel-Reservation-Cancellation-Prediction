@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reservation Desk</title>
+  <link rel="stylesheet" href="./static/desk.css">
+  <script src="./static/desk.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="desk-nav" aria-label="Desk navigation">
+      <a class="api-link" href="/desk/batch">Batch upload</a>
+      <a class="api-link" href="/">API reference ↗</a>
+      <a class="api-link" href="/desk/training">Training</a>
+    </nav>
+  </header>
+
+  <main class="shell">
+    <div class="intro">
+      <p class="eyebrow">01 / SINGLE BOOKING</p>
+      <h1>Review a reservation</h1>
+      <p>Enter the booking details to see how the model classifies it.</p>
+    </div>
+
+    <div class="layout">
+      <section class="panel form-panel" aria-labelledby="form-title">
+        <h2 id="form-title">Booking details</h2>
+
+        <form id="booking-form">
+          <fieldset id="booking-fields">
+            <legend class="sr-only">Reservation details</legend>
+
+            <div class="fields">
+              <label>
+                Arrival date
+                <input name="arrival" type="date" required>
+              </label>
+
+              <label>
+                Booking channel
+                <select name="market_segment_type" required>
+                  <option value="">Select a channel</option>
+                  <option value="Aviation">Aviation</option>
+                  <option value="Complementary">Complimentary</option>
+                  <option value="Corporate">Corporate</option>
+                  <option value="Offline">Offline</option>
+                  <option value="Online">Online</option>
+                </select>
+              </label>
+
+              <label>
+                Lead time in days
+                <input name="lead_time" type="number" min="0" step="1" required>
+              </label>
+
+              <label>
+                Average room price
+                <input name="avg_price_per_room" type="number" min="0" step="any" required>
+              </label>
+
+              <label>
+                Weekday nights
+                <input name="no_of_week_nights" type="number" min="0" step="1" required>
+              </label>
+
+              <label>
+                Weekend nights
+                <input name="no_of_weekend_nights" type="number" min="0" step="1" required>
+              </label>
+
+              <label>
+                Adults
+                <input name="no_of_adults" type="number" min="0" step="1" required>
+              </label>
+
+              <label>
+                Special requests
+                <input name="no_of_special_requests" type="number" min="0" step="1" required>
+              </label>
+            </div>
+
+            <div class="actions">
+              <button class="primary" id="predict-button" type="submit">Run prediction</button>
+              <button class="secondary" id="example-button" type="button">Load example</button>
+            </div>
+          </fieldset>
+        </form>
+
+        <p class="error" id="error" role="alert" hidden></p>
+      </section>
+
+      <aside class="panel result-panel" id="result-panel" aria-labelledby="result-title">
+        <p class="eyebrow">MODEL OUTPUT</p>
+        <h2 id="result-title">Prediction</h2>
+        <p class="muted" id="status" role="status">Ready for a booking.</p>
+
+        <div id="result" hidden>
+          <p class="outcome" id="outcome"></p>
+          <p class="muted" id="result-details"></p>
+
+          <div class="score">
+            <span>Model cancellation score</span>
+            <strong id="score"></strong>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+</body>
+</html>

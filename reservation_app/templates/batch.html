@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Batch predictions · Reservation Desk</title>
+  <link rel="stylesheet" href="/desk/static/desk.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/desk/">Reservation Desk</a>
+    <nav class="desk-nav" aria-label="Desk navigation">
+      <a class="api-link" href="/desk/">Single booking</a>
+      <a class="api-link" href="/">API reference ↗</a>
+      <a class="api-link" href="/desk/training">Training</a>
+    </nav>
+  </header>
+
+  <main class="shell">
+    <div class="intro">
+      <p class="eyebrow">02 / BATCH PREDICTIONS</p>
+      <h1>Review a booking list</h1>
+      <p>Upload a CSV or Excel workbook to score up to 1,000 reservations.</p>
+    </div>
+
+    <section class="panel" aria-labelledby="upload-title">
+      <h2 id="upload-title">Upload reservations</h2>
+
+      <form action="/desk/batch" method="post" enctype="multipart/form-data">
+        <label>
+          Booking file
+          <input
+            name="file"
+            type="file"
+            accept=".csv,.xlsx"
+            aria-describedby="upload-hint"
+            required
+          >
+        </label>
+
+        <p class="muted" id="upload-hint">
+          CSV or .xlsx, up to 2 MiB. For Excel, use the first sheet.
+        </p>
+
+        <div class="actions">
+          <button class="primary" type="submit">Run batch</button>
+          <a class="secondary batch-link" href="/desk/batch/sample.csv">
+            Download sample ↓
+          </a>
+        </div>
+      </form>
+
+      {% if error %}
+        <p class="error" role="alert">{{ error }}</p>
+      {% endif %}
+    </section>
+
+    {% if results %}
+      <section class="panel batch-results" aria-labelledby="batch-title">
+        <div class="batch-heading">
+          <div>
+            <p class="eyebrow">MODEL OUTPUT</p>
+            <h2 id="batch-title">Batch results</h2>
+            <p class="muted batch-filename">{{ filename }}</p>
+          </div>
+
+          <a
+            class="secondary batch-link"
+            href="data:text/csv;charset=utf-8,{{ export_csv | urlencode }}"
+            download="booking-predictions.csv"
+          >Export results ↓</a>
+        </div>
+
+        <dl class="batch-stats">
+          <div><dt>Bookings</dt><dd>{{ results | length }}</dd></div>
+          <div><dt>Canceled</dt><dd>{{ canceled }}</dd></div>
+          <div><dt>Not canceled</dt><dd>{{ kept }}</dd></div>
+        </dl>
+
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Booking predictions">
+          <table class="batch-table">
+            <thead>
+              <tr>
+                <th scope="col">Booking row</th>
+                <th scope="col">Prediction</th>
+                <th scope="col">Model cancellation score</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for row in results %}
+                <tr>
+                  <td>{{ row.row }}</td>
+                  <td>
+                    {% if row.status == "Canceled" %}
+                      <span class="batch-badge canceled">Canceled</span>
+                    {% else %}
+                      <span class="batch-badge kept">Not canceled</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ "%.2f" | format(row.cancellation_score * 100) }}%</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    {% endif %}
+  </main>
+</body>
+</html>

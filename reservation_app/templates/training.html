@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Train model · Reservation Desk</title>
+  <link rel="stylesheet" href="/desk/static/desk.css">
+  <script src="/desk/static/training.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/desk/">Reservation Desk</a>
+    <nav class="desk-nav" aria-label="Desk navigation">
+      <a class="api-link" href="/desk/">Single booking</a>
+      <a class="api-link" href="/desk/batch">Batch upload</a>
+    </nav>
+  </header>
+
+  <main class="shell">
+    <div class="intro">
+      <p class="eyebrow">03 / MODEL TRAINING</p>
+      <h1>Train a model</h1>
+      <p>Run the existing hotel reservation pipeline and publish the result.</p>
+    </div>
+
+    <div class="layout">
+      <section class="panel" aria-labelledby="training-title">
+        <h2 id="training-title">Training data</h2>
+        <p class="muted">Use the local CSV, or download a fresh copy from Google Cloud.</p>
+
+        <label class="training-option">
+          <input id="refresh-data" type="checkbox">
+          Refresh the CSV from Google Cloud
+        </label>
+
+        <button class="primary" id="train" type="button" disabled>
+          Train model
+        </button>
+
+        <p class="error" id="training-error" role="alert" hidden></p>
+      </section>
+
+      <section class="panel result-panel" aria-labelledby="status-title">
+        <p class="eyebrow">TRAINING STATUS</p>
+        <h2 id="status-title">Current run</h2>
+        <p id="training-state" class="muted" role="status">Checking status…</p>
+      </section>
+    </div>
+
+    <section class="panel batch-results" id="training-report" aria-labelledby="report-title" hidden>
+      <p class="eyebrow">PUBLISHED MODEL</p>
+      <h2 id="report-title">Evaluation report</h2>
+      <p class="muted">Version <code id="trained-version"></code></p>
+
+      <dl class="batch-stats training-stats">
+        <div><dt>Accuracy</dt><dd id="accuracy"></dd></div>
+        <div><dt>Precision</dt><dd id="precision"></dd></div>
+        <div><dt>Recall</dt><dd id="recall"></dd></div>
+        <div><dt>F1</dt><dd id="f1"></dd></div>
+      </dl>
+
+      <p class="muted">Precision, recall, and F1 use Not canceled as the positive class.</p>
+    </section>
+  </main>
+</body>
+</html>

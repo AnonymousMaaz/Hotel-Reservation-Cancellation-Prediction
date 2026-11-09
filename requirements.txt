@@ -11,3 +11,5 @@ imbalanced-learn
 xgboost
 lightgbm
 mlflow
+bentoml
+openpyxl
