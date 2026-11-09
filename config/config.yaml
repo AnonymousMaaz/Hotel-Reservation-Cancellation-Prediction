@@ -25,3 +25,4 @@ data_processing:
   - no_of_special_requests
   skewness_threshold: 5
   num_of_features: 10
+  train_ratio: 0.8

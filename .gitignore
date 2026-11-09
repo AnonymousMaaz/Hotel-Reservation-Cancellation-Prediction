@@ -7,3 +7,5 @@ logs/
 *.pkl
 mapping.json
 insert_into_yaml.py
+mlflow.db
+mlruns/*

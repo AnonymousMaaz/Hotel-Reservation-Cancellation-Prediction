@@ -8,6 +8,7 @@ import pandas as pd
 from config.paths_config import *
 from imblearn.over_sampling import SMOTENC
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from utils.common_functions import load_data, read_yaml
 
@@ -22,6 +23,8 @@ class DataProcessor:
         self.config = read_yaml(CONFIG_PATH)["data_processing"]
         self.raw_file_path = RAW_FILE_PATH
         self.processed_dir = PROCESSED_DIR
+        self.train_file_path = PROCESSED_TRAIN_DATA_PATH
+        self.test_file_path = PROCESSED_TEST_DATA_PATH
         self.processed_file_path = PREPROCESSED_DATA_FILE_PATH
 
         if not os.path.exists(self.processed_dir):
@@ -146,29 +149,70 @@ class DataProcessor:
             logger.exception("Error While Feature Selection.")
             raise CustomException(e, sys) from None
 
-    def save_data(self, df) -> None:
+    def save_data(self, df: pd.DataFrame, file_path: str | Path) -> None:
+        """Save a DataFrame to the specified CSV File."""
         try:
+            file_path = Path(file_path)
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+
             logger.info("Saving the data into the processed folder")
 
             df.to_csv(
-                self.processed_file_path,
+                file_path,
                 index=False,
             )
-            logger.info(
-                f"Data Saved Successfully at: {os.path.abspath(self.processed_file_path)}"
-            )
+            logger.info(f"Data Saved Successfully at: {os.path.abspath(file_path)}")
+
         except Exception as e:
             logger.exception(
                 "Exception Occurred during conversion of DataFrame to CSV."
             )
-            raise CustomException(e, sys)
+            raise CustomException(e, sys) from e
+
+    def split_data(self, df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+        """Split the dataset into training and testing DataFrames."""
+
+        try:
+            logger.info("Splitting dataset into train and test...")
+
+            train_df, test_df = train_test_split(
+                df,
+                test_size=1 - self.config.get("train_ratio", 0.8),
+                random_state=42,
+                stratify=df[TARGET_COLUMN],
+            )
+            train_df = train_df.reset_index(drop=True)
+            test_df = test_df.reset_index(drop=True)
+
+            logger.info(f"Training dataset shape: {train_df.shape}")
+            logger.info(f"Testing dataset shape: {test_df.shape}")
+
+            return train_df, test_df
+        except Exception as e:
+            logger.exception("Error while splitting dataset")
+            raise CustomException(e, sys) from e
 
     def run(self) -> None:
         preprocessed_data = self.preprocess_data()
-        balanced_data = self.balance_data(preprocessed_data)
-        feature_selected_df = self.feature_selection(balanced_data)
+        train_df, test_df = self.split_data(preprocessed_data)
 
-        self.save_data(feature_selected_df)
+        balanced_train_df = self.balance_data(train_df)
+
+        feature_selected_df = self.feature_selection(balanced_train_df)
+
+        selected_features = [
+            col for col in feature_selected_df.columns if col != TARGET_COLUMN
+        ]
+
+        selected_test_df = test_df[selected_features + [TARGET_COLUMN]].copy()
+
+        self.save_data(preprocessed_data, self.processed_file_path)
+
+        self.save_data(feature_selected_df, self.train_file_path)
+
+        self.save_data(selected_test_df, self.test_file_path)
+
+        logger.info("Data preprocessing pipeline completed successfully!")
 
 
 if __name__ == "__main__":
