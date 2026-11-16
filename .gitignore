@@ -10,3 +10,4 @@ insert_into_yaml.py
 mlflow.db
 mlruns/*
 reservation_app/model_versions/*
+commands.txt
