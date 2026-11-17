@@ -102,7 +102,7 @@ pipeline {
 
                             gcloud config set project "${GCP_PROJECT}"
 
-                            gcloud run deploy hotel_reservation_cancellation_prediction \
+                            gcloud run deploy hotel-reservation-cancellation-prediction \
                                 --image="gcr.io/${GCP_PROJECT}/hotel_reservation_cancellation_prediction:latest" \
                                 --platform=managed \
                                 --region=us-central1 \
